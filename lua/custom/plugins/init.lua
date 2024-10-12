@@ -7,7 +7,7 @@ return {
     'projekt0n/github-nvim-theme',
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'github_dark_high_contrast'
+      vim.cmd.colorscheme 'github_dark_dimmed'
       vim.api.nvim_set_hl(0, 'LspSignatureActiveParameter', { fg = 'green' })
       vim.api.nvim_set_hl(0, 'WinSeparator', { fg = '#000000' })
     end,
@@ -20,7 +20,7 @@ return {
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'github_dark_high_contrast',
+        theme = 'github_dark_dimmed',
         component_separators = '|',
         section_separators = '',
       },
