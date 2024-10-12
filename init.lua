@@ -131,6 +131,13 @@ vim.opt.signcolumn = 'yes'
 -- Decrease update time
 vim.opt.updatetime = 250
 
+-- Remove command line height
+vim.o.cmdheight = 0
+
+-- default tab width to 4
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
 vim.opt.timeoutlen = 300
@@ -164,8 +171,8 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>ld', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
+vim.keymap.set('n', '<leader>lf', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -280,19 +287,20 @@ require('lazy').setup({
       require('which-key').setup()
 
       -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-        ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-      }
-      -- visual mode
-      require('which-key').register({
-        ['<leader>h'] = { 'Git [H]unk' },
-      }, { mode = 'v' })
+      -- require('which-key').add(mappings, opts?)
+      -- require('which-key').register {
+      --   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+      --   ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
+      --   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
+      --   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
+      --   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+      --   ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
+      --   ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+      -- }
+      -- -- visual mode
+      -- require('which-key').register({
+      --   ['<leader>h'] = { 'Git [H]unk' },
+      -- }, { mode = 'v' })
     end,
   },
 
@@ -323,9 +331,6 @@ require('lazy').setup({
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-
-      -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -537,6 +542,10 @@ require('lazy').setup({
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
             end, '[T]oggle Inlay [H]ints')
           end
+
+          -- vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+          --   virtual_text = false,
+          -- })
         end,
       })
 
@@ -565,9 +574,18 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        -- Golang
         gopls = {},
+        gofumpt = {},
+
+        -- Python
         pyright = {},
+
+        -- Haskell
+        -- hls = {},
+        -- hlint = {},
+
+        -- Rust
         rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -733,14 +751,14 @@ require('lazy').setup({
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          --['<CR>'] = cmp.mapping.confirm { select = true },
-          --['<Tab>'] = cmp.mapping.select_next_item(),
-          --['<S-Tab>'] = cmp.mapping.select_prev_item(),
+          ['<CR>'] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = cmp.mapping.select_next_item(),
+          -- ['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
           --  completions whenever it has completion options available.
-          ['<C-Space>'] = cmp.mapping.complete {},
+          ['<C-i>'] = cmp.mapping.complete {},
 
           -- Think of <c-l> as moving to the right of your snippet expansion.
           --  So if you have a snippet that's like:
@@ -750,16 +768,16 @@ require('lazy').setup({
           --
           -- <c-l> will move you to the right of each of the expansion locations.
           -- <c-h> is similar, except moving you backwards.
-          ['<C-l>'] = cmp.mapping(function()
-            if luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            end
-          end, { 'i', 's' }),
-          ['<C-h>'] = cmp.mapping(function()
-            if luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            end
-          end, { 'i', 's' }),
+          -- ['<C-l>'] = cmp.mapping(function()
+          --   if luasnip.expand_or_locally_jumpable() then
+          --     luasnip.expand_or_jump()
+          --   end
+          -- end, { 'i', 's' }),
+          -- ['<C-h>'] = cmp.mapping(function()
+          --   if luasnip.locally_jumpable(-1) then
+          --     luasnip.jump(-1)
+          --   end
+          -- end, { 'i', 's' }),
 
           -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -830,6 +848,11 @@ require('lazy').setup({
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
+  },
+  {
+    'mrcjkb/haskell-tools.nvim',
+    version = '^3', -- Recommended
+    lazy = false, -- This plugin is already lazy
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
@@ -911,16 +934,19 @@ require('lazy').setup({
 -- vim: ts=2 sts=2 sw=2 et
 
 -- bufferline keymaps
-vim.keymap.set("n", "<C-,>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev Buffer" })
-vim.keymap.set("n", "<C-.>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next Buffer" })
-vim.keymap.set("n", "<C-A-,>", "<cmd>BufferLineMovePrev<cr>", { desc = "Move Buffer Prev" })
-vim.keymap.set("n", "<C-A-.>", "<cmd>BufferLineMoveNext<cr>", { desc = "Move Buffer Next" })
+vim.keymap.set('n', '<C-,>', '<cmd>BufferLineCyclePrev<cr>', { desc = 'Prev Buffer' })
+vim.keymap.set('n', '<C-.>', '<cmd>BufferLineCycleNext<cr>', { desc = 'Next Buffer' })
+vim.keymap.set('n', '<C-A-,>', '<cmd>BufferLineMovePrev<cr>', { desc = 'Move Buffer Prev' })
+vim.keymap.set('n', '<C-A-.>', '<cmd>BufferLineMoveNext<cr>', { desc = 'Move Buffer Next' })
 
+local bufremove = require 'mini.bufremove'
+vim.keymap.set('n', '<leader>c', function()
+  bufremove.delete(nil, false)
+end, { desc = 'Close Buffer' })
+vim.keymap.set('n', '<leader>C', function()
+  bufremove.delete(nil, true)
+end, { desc = 'Force Close Buffer' })
+vim.keymap.set('n', '<leader>n', '<cmd>enew<cr>', { desc = 'New Buffer' })
 
-local bufremove = require("mini.bufremove")
-vim.keymap.set("n", "<leader>c", function() bufremove.delete(nil, false) end, { desc = "Close Buffer" })
-vim.keymap.set("n", "<leader>C", function() bufremove.delete(nil, true) end, { desc = "Force Close Buffer" })
-vim.keymap.set("n", "<leader>n", "<cmd>enew<cr>", { desc = "New Buffer" })
-
-vim.keymap.set({ "n", "i" }, "<A-DOWN>", "<cmd>m .+1<cr>", { desc = "Move line down" })
-vim.keymap.set({ "n", "i" }, "<A-UP>", "<cmd>m .-2<cr>", { desc = "Move line up" })
+vim.keymap.set({ 'n', 'i' }, '<A-DOWN>', '<cmd>m .+1<cr>', { desc = 'Move line down' })
+vim.keymap.set({ 'n', 'i' }, '<A-UP>', '<cmd>m .-2<cr>', { desc = 'Move line up' })

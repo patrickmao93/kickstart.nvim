@@ -72,7 +72,7 @@ require('lazy').setup({
     'tpope/vim-fugitive',
     config = function()
       vim.keymap.set('n', '<leader>gb', '<cmd>GBrowse<cr>', { desc = 'Browse on Github' })
-    end
+    end,
   },
   'tpope/vim-rhubarb',
 
@@ -91,7 +91,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',       tag = 'legacy', opts = {} },
+      { 'j-hui/fidget.nvim', tag = 'legacy', opts = { ignore_empty_message = true } },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -115,7 +115,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = {} },
+  { 'folke/which-key.nvim', opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -129,8 +129,7 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
       on_attach = function(bufnr)
-        vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk,
-          { buffer = bufnr, desc = '[G]o to [P]revious Hunk' })
+        vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk, { buffer = bufnr, desc = '[G]o to [P]revious Hunk' })
         vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk, { buffer = bufnr, desc = '[G]o to [N]ext Hunk' })
         vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk, { buffer = bufnr, desc = '[P]review [H]unk' })
       end,
@@ -142,8 +141,8 @@ require('lazy').setup({
     priority = 1000,
     config = function()
       vim.cmd.colorscheme 'github_dark_high_contrast'
-      vim.api.nvim_set_hl(0, 'LspSignatureActiveParameter', { fg = "green" })
-      vim.api.nvim_set_hl(0, 'VertSplit', { fg = "#212327" })
+      vim.api.nvim_set_hl(0, 'LspSignatureActiveParameter', { fg = 'green' })
+      vim.api.nvim_set_hl(0, 'VertSplit', { fg = '#212327' })
     end,
   },
 
@@ -291,7 +290,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
-require('telescope').setup({})
+require('telescope').setup {}
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
@@ -300,8 +299,7 @@ pcall(require('telescope').load_extension, 'fzf')
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set({ 'n', 'v' }, '/', '<Nop>', { silent = true })
-vim.keymap.set('n', '/', require('telescope.builtin').current_buffer_fuzzy_find,
-  { desc = 'Fuzzily search in current buffer' })
+vim.keymap.set('n', '/', require('telescope.builtin').current_buffer_fuzzy_find, { desc = 'Fuzzily search in current buffer' })
 
 vim.keymap.set('n', '<leader>fg', require('telescope.builtin').git_files, { desc = '[F]ind [G]it files' })
 vim.keymap.set('n', '<leader>ff', require('telescope.builtin').find_files, { desc = '[F]ind [F]iles' })
@@ -402,7 +400,7 @@ local on_attach = function(_, bufnr)
   nmap('<leader>lr', vim.lsp.buf.rename, '[L]sp [R]ename')
   nmap('<leader>la', vim.lsp.buf.code_action, '[L]sp code [A]ction')
 
-  local builtin = require('telescope.builtin')
+  local builtin = require 'telescope.builtin'
   nmap('gd', builtin.lsp_definitions, '[G]oto [D]efinition')
   nmap('gr', builtin.lsp_references, '[G]oto [R]eferences')
   nmap('gI', builtin.lsp_implementations, '[G]oto [I]mplementation')
@@ -474,7 +472,7 @@ mason_lspconfig.setup_handlers {
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
     }
-  end
+  end,
 }
 
 -- [[ Configure nvim-cmp ]]
@@ -529,16 +527,19 @@ cmp.setup {
 -- vim: ts=2 sts=2 sw=2 et
 
 -- bufferline keymaps
-vim.keymap.set("n", "<C-,>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev Buffer" })
-vim.keymap.set("n", "<C-.>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next Buffer" })
-vim.keymap.set("n", "<C-A-,>", "<cmd>BufferLineMovePrev<cr>", { desc = "Move Buffer Prev" })
-vim.keymap.set("n", "<C-A-.>", "<cmd>BufferLineMoveNext<cr>", { desc = "Move Buffer Next" })
+vim.keymap.set('n', '<C-,>', '<cmd>BufferLineCyclePrev<cr>', { desc = 'Prev Buffer' })
+vim.keymap.set('n', '<C-.>', '<cmd>BufferLineCycleNext<cr>', { desc = 'Next Buffer' })
+vim.keymap.set('n', '<A-,>', '<cmd>BufferLineMovePrev<cr>', { desc = 'Move Buffer Prev' })
+vim.keymap.set('n', '<A-.>', '<cmd>BufferLineMoveNext<cr>', { desc = 'Move Buffer Next' })
 
+local bufremove = require 'mini.bufremove'
+vim.keymap.set('n', '<leader>c', function()
+  bufremove.delete(nil, false)
+end, { desc = 'Close Buffer' })
+vim.keymap.set('n', '<leader>C', function()
+  bufremove.delete(nil, true)
+end, { desc = 'Force Close Buffer' })
+vim.keymap.set('n', '<leader>n', '<cmd>enew<cr>', { desc = 'New Buffer' })
 
-local bufremove = require("mini.bufremove")
-vim.keymap.set("n", "<leader>c", function() bufremove.delete(nil, false) end, { desc = "Close Buffer" })
-vim.keymap.set("n", "<leader>C", function() bufremove.delete(nil, true) end, { desc = "Force Close Buffer" })
-vim.keymap.set("n", "<leader>n", "<cmd>enew<cr>", { desc = "New Buffer" })
-
-vim.keymap.set({ "n", "i" }, "<A-DOWN>", "<cmd>m .+1<cr>", { desc = "Move line down" })
-vim.keymap.set({ "n", "i" }, "<A-UP>", "<cmd>m .-2<cr>", { desc = "Move line up" })
+vim.keymap.set({ 'n', 'i' }, '<A-DOWN>', '<cmd>m .+1<cr>', { desc = 'Move line down' })
+vim.keymap.set({ 'n', 'i' }, '<A-UP>', '<cmd>m .-2<cr>', { desc = 'Move line up' })
