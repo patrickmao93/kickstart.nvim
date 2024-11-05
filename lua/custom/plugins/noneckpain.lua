@@ -4,9 +4,11 @@ return {
   config = function()
     require('no-neck-pain').setup {
       width = 160,
-      buffers = {},
-      colors = {
-        blend = 0.2,
+      buffers = {
+        colors = {
+          background = '#000000',
+          blend = 0.04,
+        },
       },
       autocmds = {
         -- When `true`, enables the plugin when you start Neovim.
