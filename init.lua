@@ -314,6 +314,15 @@ require('lazy').setup({
             require('telescope.themes').get_dropdown(),
           },
         },
+        pickers = {
+          help_tags = {
+            mappings = {
+              i = {
+                ['<CR>'] = 'file_vsplit',
+              },
+            },
+          },
+        },
       }
 
       -- Enable Telescope extensions if they are installed
@@ -455,8 +464,17 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- Golang
-        gopls = {},
-        gofumpt = {},
+        gopls = {
+          settings = {
+            gopls = {
+              analyses = {
+                unusedparams = true,
+              },
+              staticcheck = true,
+              gofumpt = true,
+            },
+          },
+        },
 
         -- Python
         pyright = {},

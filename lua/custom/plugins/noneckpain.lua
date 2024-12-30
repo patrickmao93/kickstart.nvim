@@ -3,11 +3,11 @@ return {
   version = '*',
   config = function()
     require('no-neck-pain').setup {
-      width = 160,
+      width = 140,
       buffers = {
         colors = {
-          background = '#000000',
-          blend = 0.04,
+          background = '#08090C',
+          blend = 0.00,
         },
       },
       autocmds = {
@@ -16,6 +16,7 @@ return {
         -- The command is cleaned once it has successfuly ran once.
         --- @type boolean
         enableOnVimEnter = true,
+        enableOnTabEnter = true,
         -- When `true`, entering one of no-neck-pain side buffer will automatically skip it and go to the next available buffer.
         --- @type boolean
         skipEnteringNoNeckPainBuffer = true,
