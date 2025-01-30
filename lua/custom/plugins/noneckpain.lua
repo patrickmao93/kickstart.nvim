@@ -6,8 +6,8 @@ return {
       width = 140,
       buffers = {
         colors = {
-          background = '#08090C',
-          blend = 0.00,
+          -- background = '#08090C',
+          -- blend = 0.00,
         },
       },
       autocmds = {
